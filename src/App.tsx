@@ -21,7 +21,7 @@ function PromptList() {
   };
 
   const handleCreatePrompt = async (title: string, description: string, prompt: string, tags: string[]) => {
-      const response = await axios.post<Prompt>('http://localhost:3000/prompts', { title, description, prompt, tags }).then((response) => {
+      await axios.post<Prompt>('http://localhost:3000/prompts', { title, description, prompt, tags }).then((response) => {
       if (response.status === 200) {
           setPrompts([...prompts, response.data]);
       }    
@@ -35,19 +35,19 @@ function PromptList() {
     axios.get<Prompt[]>('http://localhost:3000/prompts')
       .then((response) => {
         setPrompts(response.data);
-        console.log(prompts);
-      })
+        })
       .catch((error) => {
         // Handle the error
         console.log(error);
       });
-  }, []);
+  }, [prompts]);
 
   return (
-    <div className="flex justify-center flex-wrap">
+    <div>
       <CreatePromptButton onCreatePrompt={handleCreatePrompt} />
+    <div className="flex justify-center flex-wrap">
       {prompts.map((prompt) => (
-        <div key={prompt.id} className="m-4">
+        <div key={prompt.id} className="m-4 w-80">
           <PromptCard
             key={prompts.length}
             title={prompt.title}
@@ -59,6 +59,7 @@ function PromptList() {
           />
         </div>
       ))}
+    </div>
     </div>
   );
 }

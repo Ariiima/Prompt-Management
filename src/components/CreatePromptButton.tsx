@@ -23,8 +23,9 @@ function CreatePromptButton({ onCreatePrompt }: CreatePromptButtonProps) {
 
     return (
         <>
-            <button onClick={() => setShowModal(true)}>Create Prompt</button>
-            {showModal && (
+            <button onClick={() => setShowModal(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Create Prompt
+            </button>            {showModal && (
                 <Modal isOpen={true} modalName="Create Prompt" onClose={() => setShowModal(false)}>
                     <h2 className="text-lg font-bold mb-4">Create Prompt</h2>
                     <form className="space-y-4">
