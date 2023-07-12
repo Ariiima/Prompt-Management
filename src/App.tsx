@@ -1,22 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PromptCard from './components/PromptCard';
+import CreatePromptButton from './components/CreatePromptButton';
+import axios from 'axios';
+
+interface Prompt {
+  id: string;
+  title: string;
+  description: string;
+  prompt: string;
+  tags: string[];
+  isLiked: boolean;
+}
 
 function PromptList() {
-  const prompts = [
-    { id: 1, title: 'Prompt 1', description: 'Description of Prompt 1' },
-    { id: 2, title: 'Prompt 2', description: 'Description of Prompt 2' },
-    { id: 3, title: 'Prompt 3', description: 'Description of Prompt 3' },
-    { id: 4, title: 'Prompt 4', description: 'Description of Prompt 4' },
-    { id: 5, title: 'Prompt 5', description: 'Description of Prompt 5' },
-  ];
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+
+
+  const deletePrompt = (id: string) => {
+    setPrompts(prompts.filter(prompt => prompt.id !== id));
+  };
+
+  const handleCreatePrompt = async (title: string, description: string, prompt: string, tags: string[]) => {
+      const response = await axios.post<Prompt>('http://localhost:3000/prompts', { title, description, prompt, tags }).then((response) => {
+      if (response.status === 200) {
+          setPrompts([...prompts, response.data]);
+      }    
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
+  useEffect(() => {
+    axios.get<Prompt[]>('http://localhost:3000/prompts')
+      .then((response) => {
+        setPrompts(response.data);
+        console.log(prompts);
+      })
+      .catch((error) => {
+        // Handle the error
+        console.log(error);
+      });
+  }, []);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center flex-wrap">
+      <CreatePromptButton onCreatePrompt={handleCreatePrompt} />
       {prompts.map((prompt) => (
         <div key={prompt.id} className="m-4">
           <PromptCard
+            key={prompts.length}
             title={prompt.title}
             description={prompt.description}
+            prompt={prompt.prompt}
+            tags={prompt.tags}
+            id={prompt.id}
+            deletePrompt={deletePrompt}
           />
         </div>
       ))}
