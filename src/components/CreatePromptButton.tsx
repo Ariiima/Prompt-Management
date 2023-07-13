@@ -13,13 +13,17 @@ function CreatePromptButton({ onCreatePrompt }: CreatePromptButtonProps) {
     const [tags, setTags] = useState<string[]>([]);
 
     const handleCreatePrompt = () => {
-        onCreatePrompt(title, description, prompt, tags);
-        setShowModal(false);
-        setTitle('');
-        setDescription('');
-        setPrompt('');
-        setTags([]);
-    };
+    if (title.trim() === '' || prompt.trim() === '') {
+        alert('Title and Prompt cannot be empty');
+        return;
+    }
+    onCreatePrompt(title, description, prompt, tags);
+    setShowModal(false);
+    setTitle('');
+    setDescription('');
+    setPrompt('');
+    setTags([]);
+};
 
     return (
         <>
@@ -31,7 +35,7 @@ function CreatePromptButton({ onCreatePrompt }: CreatePromptButtonProps) {
                     <form className="space-y-4">
                         <div>
                             <label htmlFor="title" className="block text-gray-700 font-bold mb-2">Title:</label>
-                            <input type="text" id="title" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-gray-400 p-2 rounded-md" />
+                            <input type="text" id="title" value={title} onChange={e => setTitle(e.target.value)} className="w-full border border-gray-400 p-2 rounded-md" required/>
                         </div>
                         <div>
                             <label htmlFor="description" className="block text-gray-700 font-bold mb-2">Description:</label>
@@ -39,7 +43,7 @@ function CreatePromptButton({ onCreatePrompt }: CreatePromptButtonProps) {
                         </div>
                         <div>
                             <label htmlFor="prompt" className="block text-gray-700 font-bold mb-2">Prompt:</label>
-                            <textarea id="prompt" value={prompt} onChange={e => setPrompt(e.target.value)} className="w-full border border-gray-400 p-2 rounded-md"></textarea>
+                            <textarea id="prompt" value={prompt} onChange={e => setPrompt(e.target.value)} className="w-full border border-gray-400 p-2 rounded-md" required></textarea>
                         </div>
                         <div>
                             <label htmlFor="tags" className="block text-gray-700 font-bold mb-2">Tags:</label>

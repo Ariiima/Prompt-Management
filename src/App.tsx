@@ -14,7 +14,7 @@ interface Prompt {
 
 function PromptList() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-
+  const [filter, setFilter] = useState<string>('');
 
   const deletePrompt = (id: string) => {
     setPrompts(prompts.filter(prompt => prompt.id !== id));
@@ -35,31 +35,42 @@ function PromptList() {
     axios.get<Prompt[]>('http://localhost:3000/prompts')
       .then((response) => {
         setPrompts(response.data);
-        })
+        console.log(response.data.map(prompt => prompt.tags));
+      })
       .catch((error) => {
         // Handle the error
         console.log(error);
       });
-  }, [prompts]);
+  }, []);
+
+  const filteredPrompts = filter ? prompts.filter(prompt => {
+  var tempFilter = filter.toLowerCase().trim();
+  return prompt.title.toLowerCase().includes(tempFilter) || prompt.description.toLowerCase().includes(tempFilter) ||
+  prompt.prompt.toLowerCase().includes(tempFilter);
+}) : prompts;
 
   return (
-    <div>
-      <CreatePromptButton onCreatePrompt={handleCreatePrompt} />
-    <div className="flex justify-center flex-wrap">
-      {prompts.map((prompt) => (
-        <div key={prompt.id} className="m-4 w-80">
-          <PromptCard
-            key={prompts.length}
-            title={prompt.title}
-            description={prompt.description}
-            prompt={prompt.prompt}
-            tags={prompt.tags}
-            id={prompt.id}
-            deletePrompt={deletePrompt}
-          />
-        </div>
-      ))}
-    </div>
+    <div className='flex flex-col bg-gray-200 h-screen overflow-y-auto'>
+      <h1 className='inline-flex justify-center text-[3rem] mt-10'>Prompt Management System</h1>
+      <div className='flex items-center justify-center'>
+        <input type="text" placeholder="Search" className='w-[50%] h-10 rounded-lg p-4 m-8' value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <CreatePromptButton onCreatePrompt={handleCreatePrompt} />
+      </div>
+     <div className={`flex justify-center flex-wrap`}>
+        {filteredPrompts.map((prompt) => (
+          <div key={prompt.id} className={`m-4 w-80`}>
+            <PromptCard
+              key={prompts.length}
+              title={prompt.title}
+              description={prompt.description}
+              prompt={prompt.prompt}
+              tags={prompt.tags}
+              id={prompt.id}
+              deletePrompt={deletePrompt}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
