@@ -15,15 +15,18 @@ interface Prompt {
 function PromptList() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [filter, setFilter] = useState<string>('');
+  const [tags, setTags] = useState<string[]>([]);
 
   const deletePrompt = (id: string) => {
     setPrompts(prompts.filter(prompt => prompt.id !== id));
   };
 
-  const handleCreatePrompt = async (title: string, description: string, prompt: string, tags: string[]) => {
-      await axios.post<Prompt>('http://localhost:3000/prompts', { title, description, prompt, tags }).then((response) => {
+  const handleCreatePrompt = async (title: string, description: string, prompt: string, promptTags: string[]) => {
+      await axios.post<Prompt>('http://localhost:3000/prompts', { title, description, prompt, promptTags }).then((response) => {
       if (response.status === 200) {
           setPrompts([...prompts, response.data]);
+          setTags([...tags, ...promptTags]);
+
       }    
     })
     .catch((error) => {
@@ -35,7 +38,8 @@ function PromptList() {
     axios.get<Prompt[]>('http://localhost:3000/prompts')
       .then((response) => {
         setPrompts(response.data);
-        console.log(response.data.map(prompt => prompt.tags));
+        setTags(response.data.flatMap(prompt => prompt.tags));
+
       })
       .catch((error) => {
         // Handle the error
@@ -55,6 +59,15 @@ function PromptList() {
       <div className='flex items-center justify-center'>
         <input type="text" placeholder="Search" className='w-[50%] h-10 rounded-lg p-4 m-8' value={filter} onChange={(e) => setFilter(e.target.value)} />
         <CreatePromptButton onCreatePrompt={handleCreatePrompt} />
+      </div>
+      <div>
+        {
+          tags.map((tag) => (
+            <div key={tag} className='inline-flex items-center justify-center text-[1.5rem] mt-10'>
+              <p className='bg-gray-300 rounded-md p-2 m-2'>{tag}</p>
+            </div>
+          ))
+        }
       </div>
      <div className={`flex justify-center flex-wrap`}>
         {filteredPrompts.map((prompt) => (
